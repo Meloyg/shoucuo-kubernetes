@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-with-config
+  labels:
+    app: myapp
+spec:
+  containers:
+  - name: app
+    image: nginx:latest
+    ports:
+    - containerPort: 8080
+    
+    # Environment variables from ConfigMap
+    env:
+    - name: DATABASE_URL
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: database_url
+    - name: APP_MODE
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: app_mode
+    
+    # Environment variables from Secret
+    - name: DB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: app-secret
+          key: username
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: app-secret
+          key: password
+    
+    # Mount ConfigMap as volume
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/config
+  
+  volumes:
+  - name: config-volume
+    configMap:
+      name: app-config
