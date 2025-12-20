@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-container-pod
+  labels:
+    app: multi-container-example
+spec:
+  containers:
+  # Main application container
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: shared-data
+      mountPath: /usr/share/nginx/html
+  
+  # Sidecar container that generates content
+  - name: content-generator
+    image: busybox:latest
+    command:
+    - /bin/sh
+    - -c
+    - |
+      while true; do
+        echo "$(date): Hello from multi-container pod" > /data/index.html
+        sleep 10
+      done
+    volumeMounts:
+    - name: shared-data
+      mountPath: /data
+  
+  # Shared volume between containers
+  volumes:
+  - name: shared-data
+    emptyDir: {}
