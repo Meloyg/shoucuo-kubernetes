@@ -78,3 +78,29 @@ az vm create -g xxx -n worker-2  --image Ubuntu2204 --size Standard_B2s --vnet-n
 ```
 
 
+## 02 · Certificate Authority（CA）章节总结
+
+![alt text](image-3.png)
+
+Kubernetes 不使用账号密码，而是基于：
+
+TLS 证书做 Authentication
+
+RBAC 做 Authorization
+
+所有组件（apiserver / kubelet / controller / scheduler / kubectl）
+都通过 CA 签发的证书 来证明自己的身份。
+
+CA = Kubernetes 世界的身份证发证机关
+
+### CA 体系总体结构
+
+| 类型                 | 用途          | 是否 server cert |
+| ------------------ | ----------- | -------------- |
+| Root CA            | 信任根         | ❌              |
+| admin              | kubectl 客户端 | ❌              |
+| kube-apiserver     | API Server  | ✅              |
+| controller-manager | 控制循环客户端     | ❌              |
+| scheduler          | 调度器客户端      | ❌              |
+| kubelet            | Node 客户端    | ❌              |
+| service-account    | SA token 签名 | ❌（RSA key）     |
